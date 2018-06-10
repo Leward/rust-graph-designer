@@ -1,0 +1,10 @@
+[package]
+name = "gui"
+version = "0.1.0"
+authors = ["Paul-Julien Vauthier <pj82491@gmail.com>"]
+
+[dependencies]
+gtk = "0.4.1"
+gdk = "0.8.0"
+cairo-rs = "0.4.1"
+
