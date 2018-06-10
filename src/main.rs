@@ -43,18 +43,24 @@ fn main() {
     }));
 
     let vbox = gtk::Box::new(Orientation::Vertical, 0);
-    vbox.set_homogeneous(true);
     window.add(&vbox);
+
+    let toolbar_hbox = gtk::Box::new(Orientation::Horizontal, 0);
+    let add_node_btn = Button::new_with_label("Add Node");
+    toolbar_hbox.pack_start(&add_node_btn, false, false, 0);
+    let add_rel_btn = Button::new_with_label("Add Relationship");
+    toolbar_hbox.pack_start(&add_rel_btn, false, false, 0);
+    vbox.pack_start(&toolbar_hbox, false, false, 0);
 
     let drawing_area = DrawingArea::new();
     drawing_area.set_events(EventMask::BUTTON_PRESS_MASK.bits() as i32);
-    vbox.add(&drawing_area);
+    vbox.pack_start(&drawing_area, true, true, 0);
 
     let label = Label::new(Some("0"));
-    vbox.add(&label);
+    vbox.pack_start(&label, false, false, 0);
 
     let button = Button::new_with_label("Increment");
-    vbox.add(&button);
+    vbox.pack_start(&button, false, false, 0);
 
     window.show_all();
 
@@ -103,6 +109,10 @@ fn main() {
 fn draw_fn(da: &DrawingArea, cr: &Context, model: &Rc<RefCell<Model>>) -> gtk::Inhibit {
     let width = da.get_allocated_width() as f64;
     let height = da.get_allocated_height() as f64;
+    // allocation describes size and position of the widget in the window
+    // drawing to x in the canvas, means drawing to x + allocation.x in the window
+    // it seems to be the values used by the drawing context
+    let allocation = da.get_allocation(); 
 
     cr.set_source_rgba(0.77, 0.77, 0.77, 1.0);
     cr.rectangle(0.0, 0.0, width, height);
@@ -110,13 +120,14 @@ fn draw_fn(da: &DrawingArea, cr: &Context, model: &Rc<RefCell<Model>>) -> gtk::I
 
     let rect = |x, y, width, height| {
         let point = cr.device_to_user(x, y);
-        let size = cr.device_to_user(width, height);
-        cr.rectangle(point.0, point.1, size.0, size.1);
+        let point = (point.0 + allocation.x as f64, point.1 + allocation.y as f64);
+        cr.rectangle(point.0, point.1, width, height);
         cr.fill();
     };
 
     let draw_node = |x, y| {
         let point = cr.device_to_user(x, y);
+        let point = (point.0 + allocation.x as f64, point.1 + allocation.y as f64);
         let distance = cr.device_to_user_distance(15.0, 15.0);
         cr.arc(point.0, point.1, distance.0, 0.0, PI * 2.0);
         cr.fill();
