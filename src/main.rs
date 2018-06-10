@@ -5,87 +5,18 @@ extern crate gtk;
 use gtk::prelude::*;
 
 use cairo::Context;
-use gtk::{Button, DrawingArea, Label, Orientation, Window, WindowType};
+use gtk::DrawingArea;
 
-use gdk::{EventButton, EventMask, EventType};
+use gdk::{EventButton, EventType};
 
-// use std::cell::Ref;
 use std::cell::RefCell;
 use std::f64::consts::PI;
 use std::rc::Rc;
 
-struct Node {
-    position: (f64, f64),
-}
-
-struct Model {
-    count: i32,
-    nodes: Vec<Node>,
-}
-
-struct App {
-    model: Rc<RefCell<Model>>,
-    window: Window,
-    vbox: gtk::Box,
-    toolbar: gtk::Box,
-    toolbar_add_node_btn: Button,
-    toolbar_add_rel_btn: Button,
-    drawing_area: DrawingArea,
-    label: Label,
-    button: Button,
-}
-
-impl App {
-    fn new() -> App {
-        let model = Model {
-            count: 0,
-            nodes: vec![
-                Node {
-                    position: (80.0, 80.0),
-                },
-                Node {
-                    position: (150., 200.),
-                },
-            ],
-        };
-
-        let window = Window::new(WindowType::Toplevel);
-        window.set_title("Graph Editor");
-        window.set_default_size(500, 500);
-
-        let vbox = gtk::Box::new(Orientation::Vertical, 0);
-        window.add(&vbox);
-
-        let toolbar_hbox = gtk::Box::new(Orientation::Horizontal, 0);
-        let add_node_btn = Button::new_with_label("Add Node");
-        toolbar_hbox.pack_start(&add_node_btn, false, false, 0);
-        let add_rel_btn = Button::new_with_label("Add Relationship");
-        toolbar_hbox.pack_start(&add_rel_btn, false, false, 0);
-        vbox.pack_start(&toolbar_hbox, false, false, 0);
-
-        let drawing_area = DrawingArea::new();
-        drawing_area.set_events(EventMask::BUTTON_PRESS_MASK.bits() as i32);
-        vbox.pack_start(&drawing_area, true, true, 0);
-
-        let label = Label::new(Some("0"));
-        vbox.pack_start(&label, false, false, 0);
-
-        let button = Button::new_with_label("Increment");
-        vbox.pack_start(&button, false, false, 0);
-
-        App {
-            model: Rc::new(RefCell::new(model)),
-            window: window,
-            vbox: vbox,
-            toolbar: toolbar_hbox,
-            toolbar_add_node_btn: add_node_btn,
-            toolbar_add_rel_btn: add_rel_btn,
-            drawing_area: drawing_area,
-            label: label,
-            button: button
-        }
-    }
-}
+mod app;
+use app::App;
+use app::Model;
+use app::Node;
 
 fn main() {
     gtk::init().unwrap();
